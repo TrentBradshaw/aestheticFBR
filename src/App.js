@@ -1,19 +1,34 @@
 import React, {useState, useEffect} from 'react';
+import {
+    BrowserRouter as Router,
+    Switch,
+    Route,
+    Link
+  } from "react-router-dom";
 import fire from './fire';
 import Login from './Login';
-import Home from './Home'
+import Home from './Components/Home/Home'
+import Header from './Components/Header/Header';
+
+const db = fire.firestore();											  // connect to firebases firebase firestore database
+db.settings({timestampsInSnapshots: true}); 								  // allow timestamps to come with the snapshots
+const storageService = fire.storage();									  // refer to the firebase storage(image hosting in this case);
+const storageRef = storageService.ref();
+const database = fire.database();
+const auth = fire.auth();
 
 const App = () => {
 
     console.log('yee')
     const [user, setUser] = useState('');
-
+    const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
     const [emailError, setEmailError] = useState('');
     const [passwordError, setPasswordError] = useState('');
     const [hasAccount, setHasAccount] = useState(false);
+    const [authChecked, setAuthChecked] = useState(false);
 
     const clearInputs = () => {
         setEmail('');
@@ -44,9 +59,25 @@ const App = () => {
     };
     const handleSignup = () => {
         clearErrors();
-        fire
-        .auth()
-        .createUserWithEmailAndPassword(email, password)
+        auth
+        .createUserWithEmailAndPassword(email, password).then((user) =>{
+            if (user) {
+				console.log(user);
+				// initialize values in storage
+				db.collection('users').doc(user.user.uid).set({ 
+                    // enter the user in the database with a userID, email, initialization for aesthetic list and username
+					userID: user.user.uid,
+					email: user.user.email,
+					username: username,
+					twitterUrl: 'Please Enter our URL',
+					instagramUrl: 'Please Enter our URL',
+					redditUrl: 'Please Enter our URL',
+					youtubeUrl: 'Please Enter our URL',
+					facebookUrl: 'Please Enter our URL',
+					profilePic: 'https://upload.wikimedia.org/wikipedia/commons/0/0e/ARMEDANGELS-A_Logo.jpg',
+				});
+			} return true;
+        })
         .catch(err => {
             switch(err.code){
                 case "auth/email-already-in-use":
@@ -69,32 +100,63 @@ const App = () => {
             if (user){
                 clearInputs();
                 setUser(user);
+                setAuthChecked(true);
             }else {setUser("")}
         });
     };
     useEffect(() => {
         authListener();
-    }, [])
-    return(
-        <div id='App'>
-        {user ? (
-            <Home handleLogout={handleLogout} />
-        ): 
-        (<Login 
-            email={email}
-            password = {password}
-            setEmail={setEmail}
-            setPassword={setPassword}
-            handleLogin={handleLogin} 
-            handleSignup={handleSignup}
-            hasAccount = {hasAccount}
-            setHasAccount = {setHasAccount}
-            emailError={emailError}
-            passwordError={passwordError}
-            />)
+        console.log(user)
+        if(user){
+            if (window.location == 'localhost:3000') 
+                window.location.href = 'localhost:3000/home'; 
         }
-        </div>
-    );
+        
+    }, [])
+    if(authChecked){
+        if(user){
+            console.log(window.location)
+            if (window.location.href == "http://localhost:3000/") 
+                window.location.href = "http://localhost:3000/home"; 
+        }
+        return(
+            <div>
+            {user 
+                ? 
+                <Router>
+                    
+                    <Route path="/" component={Header}/>
+                    <Switch>
+                        <Route path="/home" render= {() => (<Home currentUserId={user}></Home>)}/>
+                        <Route path="/user/:username/aesthetic/:aestheticId" render= {() => console.log('aesthetic')
+                        (/*<StatusContainer currentUserId={userInfo.id}></StatusContainer>*/)}/>
+                        <Route exact path="/user/:username" render={() =>(<UserPage currentUserId={userInfo.id}></UserPage>)}/>
+                    </Switch>
+                    <div id='App'>
+                        <Home handleLogout={handleLogout} />
+                    </div>
+                </Router>
+                : <Login 
+                email={email}
+                username={username}
+                password = {password}
+                setEmail={setEmail}
+                setUsername={setUsername}
+                setPassword={setPassword}
+                handleLogin={handleLogin} 
+                handleSignup={handleSignup}
+                hasAccount = {hasAccount}
+                setHasAccount = {setHasAccount}
+                emailError={emailError}
+                passwordError={passwordError}
+                />
+            }
+            </div>
+        );
+    }else{
+        return(<div>Loading app...</div>)
+    }
+    
 };
 
 export default App;

@@ -13,6 +13,10 @@ app.get('/', (req, res) => {
     res.sendFile('index.html')
 // res.status(200).send('Hello World from the server!');
 });
+app.get('/home', (req, res) => {
+    res.sendFile(__dirname + '/public' + '/index.html');
+// res.status(200).send('Hello World from the server!');
+});
 app.listen(port, function () {
  console.log('App listening on port: ' + port);
 });
