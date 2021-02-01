@@ -70,7 +70,6 @@ function Home ({currentUserId}){
         console.log(feedArray)
     }
     function deleteStatus(id){
-        let token = document.getElementById('csrf-token').getAttribute('content')
         fetch('/api/statuses/delete', {
             headers:{'X-CSRF-TOKEN': token, 'Content-Type':'application/json',},
             method: 'delete',
@@ -124,11 +123,3 @@ function Home ({currentUserId}){
 } 
 export default Home;
 
-/*
-if (document.getElementById('HomeContainer')) {
-   ReactDOM.render(<Home 
-   userId={document.getElementById('dataHolder').getAttribute('userId')}
-   pageOwnerUsername={document.getElementById('dataHolder').getAttribute('pageOwnerUsername')}
-   />, document.getElementById('HomeContainer'));
-}
-*/

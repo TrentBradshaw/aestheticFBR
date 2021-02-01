@@ -95,7 +95,7 @@ function Header() {
     }
 
     if(isLoading)
-        return(<Loading></Loading>)
+        return(<div>Loading</div>)
 
     return(
         <div>

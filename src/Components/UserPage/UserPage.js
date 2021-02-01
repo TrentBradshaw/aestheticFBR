@@ -22,7 +22,42 @@ function UserPage ({currentUserId}){
     let { username } = useParams()
 
     useEffect(() => {
-        
+        if (user) {
+                const lowerUsername = usernameHeader.innerHTML.toLowerCase();
+                db.collection('users').get().then(snapshot => {
+                    snapshot.docs.forEach(doc =>{
+                        if (doc.data().username === lowerUsername) {
+                            console.log(doc.data());
+                            const twitterAnchor = document.getElementById('twitterAnchor');
+                            twitterAnchor.setAttribute('target', '_blank');
+                            const redditAnchor = document.getElementById('redditAnchor');
+                            redditAnchor.setAttribute('target', '_blank');
+                            const instagramAnchor = document.getElementById('instagramAnchor');
+                            instagramAnchor.setAttribute('target', '_blank');
+                            const youtubeAnchor = document.getElementById('youtubeAnchor');
+                            youtubeAnchor.setAttribute('target', '_blank');
+                            const facebookAnchor = document.getElementById('facebookAnchor');
+                            facebookAnchor.setAttribute('target', '_blank');
+                            if (doc.data().twitterUrl !== 'Please Enter our URL') {
+                                console.log(doc.data().twitterUrl);
+                                twitterAnchor.setAttribute('href', doc.data().twitterUrl);
+                            }
+                            if (doc.data().instagramUrl !== 'Please Enter our URL') {
+                                instagramAnchor.setAttribute('href', doc.data().instagramUrl);
+                            }
+                            if (doc.data().facebookUrl !== 'Please Enter our URL') {
+                                facebookAnchor.setAttribute('href', doc.data().facebookUrl);
+                            }
+                            if (doc.data().youtubeUrl !== 'Please Enter our URL') {
+                                youtubeAnchor.setAttribute('href', doc.data().youtubeUrl);
+                            }
+                            if (doc.data().redditUrl !== 'Please Enter our URL') {
+                                redditAnchor.setAttribute('href', doc.data().redditUrl);
+                            }
+                        }
+                    });
+                });
+            }
         let url = new URL('http://localhost:80/api/feed')
         let param = {query: username}
         url.search = new URLSearchParams(param).toString();
