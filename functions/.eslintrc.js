@@ -10,7 +10,8 @@ module.exports = {
     "google",
   ],
   rules: {
-    quotes: ["error", "double"],
-    indent: ["error", 2],
+    "quotes": ["error", "double"],
+    "indent": ["error", 2],
+    "linebreak-style": ["error", "windows"],
   },
 };

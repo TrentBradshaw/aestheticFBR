@@ -1,63 +1,26 @@
 const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
+const usersApi = require("./api/users/");
+const aestheticsApi = require("./api/aesthetics");
+console.log(aestheticsApi);
 console.log(cors);
 const admin = require("firebase-admin");
-admin.initializeApp();
+
+admin.initializeApp(functions.config().firebase);
 
 const app = express();
+// https://expressjs.com/en/advanced/best-practice-security.html#at-a-minimum-disable-x-powered-by-header
+app.disable("x-powered-by");
 
-app.get("/", async (req, res) => {
-  const snapshot = await admin.firestore().collection("users").get();
+// Any requests to /api/users will be routed to the user router!
+app.use("/users", usersApi);
+app.use("/aesthetics", aestheticsApi);
 
-  const users = [];
-  snapshot.forEach((doc) => {
-    const id = doc.id;
-    const data = doc.data();
-
-    users.push({id, ...data});
-  });
-
-  res.status(200).send(JSON.stringify(users));
+// Again, lets be nice and help the poor wandering servers, any requests to /api
+// that are not /api/users will result in 404.
+app.get("*", async (req, res) => {
+  res.status(404).send("This route does not exist.");
 });
 
-app.get("/:id", async (req, res) => {
-  const snapshot = await admin.
-    firestore().collection("users").doc(req.params.id).get();
-
-  const userId = snapshot.id;
-  const userData = snapshot.data();
-
-  res.status(200).send(JSON.stringify({id: userId, ...userData}));
-});
-
-app.post("/", async (req, res) => {
-  const user = req.body;
-
-  await admin.firestore().collection("users").add(user);
-
-  res.status(201).send();
-});
-
-app.put("/:id", async (req, res) => {
-  const body = req.body;
-
-  await admin.firestore().collection("users").doc(req.params.id).update(body);
-
-  res.status(200).send();
-});
-
-app.delete("/:id", async (req, res) => {
-  await admin.firestore().collection("users").doc(req.params.id).delete();
-
-  res.status(200).send();
-});
-
-exports.user = functions.https.onRequest(app);
-
-// // Create and Deploy Your First Cloud Functions
-// // https://firebase.google.com/docs/functions/write-firebase-functions
-//
-exports.helloWorld = functions.https.onRequest((request, response) => {
-  response.send("Hello from Firebase!");
-});
+exports.api = functions.https.onRequest(app);
