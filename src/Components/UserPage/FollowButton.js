@@ -15,12 +15,12 @@ function FollowButton({targetName, type}){
             url = new URL('http://localhost:80/api/dockSubscriptionStatus')
         else if (type =='user')
             url = new URL('http://localhost:80/api/followers')
-        let token = document.getElementById('csrf-token').getAttribute('content')
+        //let token = document.getElementById('csrf-token').getAttribute('content')
         
         let param = {query: targetName}
         url.search = new URLSearchParams(param).toString();
         fetch(url, {
-            headers:{ 'X-CSRF-TOKEN': token, 'Content-Type':'application/json', "Access-Control-Allow-Origin" : "*", "Access-Control-Allow-Credentials" : true},
+            headers:{ 'Content-Type':'application/json', "Access-Control-Allow-Origin" : "*", "Access-Control-Allow-Credentials" : true},
             method: 'get',
             mode: "cors",
             credentials: "same-origin",
@@ -42,7 +42,9 @@ function FollowButton({targetName, type}){
             })
     }
     useEffect(() => {
+        /*
         figureOutIfFollowingOrNot();   
+        */
       }, []);
 
     function submit(){
@@ -77,7 +79,7 @@ function FollowButton({targetName, type}){
                 setIsFollowing(true);
             }
         }
-            
+        /*
         fetch(url, {
             headers:{'X-CSRF-TOKEN': document.getElementById('csrf-token').getAttribute('content'), 'Content-Type':'application/json',},
             method: method,
@@ -85,10 +87,14 @@ function FollowButton({targetName, type}){
             credentials: "same-origin",
             body: JSON.stringify({target: targetName,})
         })
+        */
     } 
-    if(isLoading){
+    {
+/* if(isLoading){
         return(<div>Loading</div>)
+    }*/
     }
+    
     return(
         <button id="followBtn" onClick={ () => submit()}>{isFollowingText}</button>
     )

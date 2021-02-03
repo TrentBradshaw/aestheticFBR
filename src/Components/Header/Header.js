@@ -52,11 +52,9 @@ function Header() {
       }));
       const classes = useStyles();
     useEffect(() => {
+        /*
         fetch('http://localhost:80/api/userdetails', {
-        headers:{
-            'X-CSRF-TOKEN': document.getElementById('csrf-token').getAttribute('content'),
-            'Content-Type':'application/json',
-        },
+        headers:{'Content-Type':'application/json'},
         method: 'get',
         mode: "same-origin",
         credentials: "same-origin",
@@ -68,7 +66,7 @@ function Header() {
                 setLoading(false);
             });
         })
-      }, []);
+    */}, []);
 
     function activateSubMenu(menu){
         setPopUpClicked(true)
@@ -94,9 +92,6 @@ function Header() {
         setStatusPopUpActive(false)
     }
 
-    if(isLoading)
-        return(<div>Loading</div>)
-
     return(
         <div>
 
@@ -104,13 +99,10 @@ function Header() {
         
 <div id = 'header'
     style={{display:'flex', width:'100%',position: 'fixed', left: '0px', top: '0px',height :'40px'}}>
-                {popUpclicked && <div onClick = {() =>popUpBackdropClicked()} id='popUpBackdrop'></div>}
-                {communityPopUpActive && <DockSubmitForm></DockSubmitForm>}
-                {postPopUpActive && <PostSubmitForm></PostSubmitForm>}
-                {statusPopUpActive && <StatusInput appendNewStatus={null} isReply = {false} parentStatusId = {null}></StatusInput>}
+                
                 <div style ={{display: 'flex', width: '100%'}}>
                 <div style={{backgroundColor: 'white'}}>
-                    <h1 className='headerText'  style={{paddingTop: '6px',paddingLeft: '2px', color: '#2762a9'}}>Harbor</h1>
+                    <h1 className='headerText'  style={{paddingTop: '6px',paddingLeft: '2px', color: '#2762a9', margin:'0px'}}>aesthetic</h1>
                 </div>
                 <nav className ='divBackground' id='headerNav' style={{display: 'flex', width: '100%', paddingTop:'7px', flexDirection: 'row',
                 justifyContent: 'space-evenly'}}>
@@ -187,10 +179,4 @@ function Header() {
         </div>
     )
 }  
-
-if (document.getElementById('Header')) {
-   var data = document.getElementById('dataHolder').getAttribute('data');
-   var currentUser = document.getElementById('dataHolder').getAttribute('currentUser')
-   ReactDOM.render(<Header data={data}/>, document.getElementById('Header'));
-}
 export default Header;

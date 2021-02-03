@@ -12,6 +12,7 @@ function Home ({currentUserId}){
     const [pfpUrl, setPfpUrl] = useState();
     
     useEffect(() => {
+        /*
         let param, url
         fetch('http://localhost:80/api/userdetails', {
         headers:{'X-CSRF-TOKEN': document.getElementById('csrf-token').getAttribute('content'), 'Content-Type':'application/json',},
@@ -59,7 +60,7 @@ function Home ({currentUserId}){
         });
         
         setLoading(false);
-    },[]);
+    */},[]);
 
     function appendNewStatus(statusObject){
         console.log(JSON.stringify(statusObject) + ' sss')
@@ -93,9 +94,12 @@ function Home ({currentUserId}){
             }
         )
     }
-
-    if(isLoading)
+{
+/*  if(isLoading)
         return(<div></div>)
+        */
+}
+   
     return (
         <div id = 'home' style= {{display:'flex', flexDirection: 'column'}} className={['baseMainContainer',].join(" ")}>
                 {

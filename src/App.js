@@ -105,6 +105,18 @@ const App = () => {
         });
     };
     useEffect(() => {
+        fetch("https://us-central1-aesthetic-92afd.cloudfunctions.net/api/users/userinfo/rckwsaik", {
+        method: 'get',
+        header: {
+            'Access-Control-Allow-Origin' : '*',
+        },
+        mode: 'cors'
+        }).then((response) => {
+            response.json().then((data) => {
+                console.log(data)
+            });
+        })
+      
         authListener();
         console.log(user)
         if(user){
@@ -124,17 +136,12 @@ const App = () => {
             {user 
                 ? 
                 <Router>
-                    
                     <Route path="/" component={Header}/>
                     <Switch>
-                        <Route path="/home" render= {() => (<Home currentUserId={user}></Home>)}/>
-                        <Route path="/user/:username/aesthetic/:aestheticId" render= {() => console.log('aesthetic')
-                        (/*<StatusContainer currentUserId={userInfo.id}></StatusContainer>*/)}/>
+                        <Route exact path="/home" render= {() => (<Home currentUserId={user}></Home>)}/>
+                        <Route exact path="/user/:username/aesthetic/:aestheticId" render= {() => console.log('aesthetic')}/>
                         <Route exact path="/user/:username" render={() =>(<UserPage currentUserId={userInfo.id}></UserPage>)}/>
                     </Switch>
-                    <div id='App'>
-                        <Home handleLogout={handleLogout} />
-                    </div>
                 </Router>
                 : <Login 
                 email={email}
