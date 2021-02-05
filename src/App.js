@@ -9,6 +9,7 @@ import fire from './fire';
 import Login from './Login';
 import Home from './Components/Home/Home'
 import Header from './Components/Header/Header';
+import UserPage from './Components/UserPage/UserPage'
 
 const db = fire.firestore();											  // connect to firebases firebase firestore database
 db.settings({timestampsInSnapshots: true}); 								  // allow timestamps to come with the snapshots
@@ -24,11 +25,11 @@ const App = () => {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-
     const [emailError, setEmailError] = useState('');
     const [passwordError, setPasswordError] = useState('');
     const [hasAccount, setHasAccount] = useState(false);
     const [authChecked, setAuthChecked] = useState(false);
+    const [currentUserInfo, setCurrentUserInfo] = useState([]);
 
     const clearInputs = () => {
         setEmail('');
@@ -101,29 +102,57 @@ const App = () => {
                 clearInputs();
                 setUser(user);
                 setAuthChecked(true);
+                console.log('user found')
+                db.collection("users").get().then((snapshot) => {
+                    snapshot.docs.forEach((doc) => {
+                        if (doc.data().userID === user.uid) {
+                            console.log('doc found')
+                            console.log(doc.data());
+                            
+                            setCurrentUserInfo(doc.data())
+                            setUsername(doc.data().username);
+                            
+                  }
+                });
+                if (window.location == 'localhost:3000') 
+                    window.location.href = 'localhost:3000/home'; 
+              });
             }else {setUser("")}
         });
     };
     useEffect(() => {
-        fetch("https://us-central1-aesthetic-92afd.cloudfunctions.net/api/users/userinfo/rckwsaik", {
-        method: 'get',
-        header: {
-            'Access-Control-Allow-Origin' : '*',
-        },
-        mode: 'cors'
-        }).then((response) => {
-            response.json().then((data) => {
-                console.log(data)
-            });
-        })
-      
         authListener();
         console.log(user)
+        console.log('yeet');
+        /*
         if(user){
+            console.log('user found')
+            db.collection("users").get().then((snapshot) => {
+                snapshot.docs.forEach((doc) => {
+                  if (doc.data().userID === user.user.uid) {
+                    console.log('doc found')
+                    setCurrentUserInfo(doc.data)
+                    setUsername(doc.data.username);
+                  }
+                });
+              });
+            /*
+            fetch("https://us-central1-aesthetic-92afd.cloudfunctions.net/api/users/userinfo/" + currentUserLoggedIn, {
+            method: 'get',
+            header: {
+                'Access-Control-Allow-Origin' : '*',
+            },
+            mode: 'cors'
+            }).then((response) => {
+                response.json().then((data) => {
+                    console.log(data.data)
+                    setCurrentUserInfo(data.data);
+                });
+            })
             if (window.location == 'localhost:3000') 
                 window.location.href = 'localhost:3000/home'; 
         }
-        
+        */
     }, [])
     if(authChecked){
         if(user){
@@ -136,11 +165,11 @@ const App = () => {
             {user 
                 ? 
                 <Router>
-                    <Route path="/" component={Header}/>
+                    <Route path="/" render={() => (<Header currentUserInfo={currentUserInfo}/>)}/>
                     <Switch>
-                        <Route exact path="/home" render= {() => (<Home currentUserId={user}></Home>)}/>
+                        <Route exact path="/home" render= {() => (<Home currentUserInfo={currentUserInfo } db={db}></Home>)}/>
                         <Route exact path="/user/:username/aesthetic/:aestheticId" render= {() => console.log('aesthetic')}/>
-                        <Route exact path="/user/:username" render={() =>(<UserPage currentUserId={userInfo.id}></UserPage>)}/>
+                        <Route exact path="/user/:username" render={() =>(<UserPage currentUserId={currentUserInfo.userID} db={db}></UserPage>)}/>
                     </Switch>
                 </Router>
                 : <Login 

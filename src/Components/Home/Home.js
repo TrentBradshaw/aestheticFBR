@@ -5,20 +5,19 @@ import ReactDOM from 'react-dom';
 import Feed from '../UserPage/Feed';
 import Usercard from '../UserPage/UserCard'
 //SPLIT THIS UP LATER. SPLIT USER PROFILE LOAD INTO ONE COMPONENT, THEN SWITCH USER CONTENT LOAD INTO ANOTHER
-function Home ({currentUserId}){
+function Home ({currentUserInfo, db}){
     const [profileOwnerInfo, setProfileOwnerInfo] = useState([]);
     const [feedArray, changeFeedArray] = useState([]);
     const [isLoading, setLoading] = useState(true);
     const [pfpUrl, setPfpUrl] = useState();
     
     useEffect(() => {
-        /*
+        
+        //get feed array
         let param, url
-        fetch('http://localhost:80/api/userdetails', {
-        headers:{'X-CSRF-TOKEN': document.getElementById('csrf-token').getAttribute('content'), 'Content-Type':'application/json',},
+        fetch('http://localhost:80/api/userdetails/' + currentUserInfo.username, {
+        headers:{'Content-Type':'application/json',},
         method: 'get',
-        mode: "same-origin",
-        credentials: "same-origin",
         }).then((response) => {
             console.log(response)
             response.json().then((data) => {
@@ -26,7 +25,6 @@ function Home ({currentUserId}){
                 url = new URL('http://localhost:80/api/profile')
                 param = {query: data['username']}
                 url.search = new URLSearchParams(param).toString();
-                
                 fetch(url, {
                     headers:{'Content-Type':'application/json',},
                     method: 'get',
@@ -47,10 +45,8 @@ function Home ({currentUserId}){
         })
        
         fetch('http://localhost:80/api/feed/home', 
-        {headers:{'X-CSRF-TOKEN': document.getElementById('csrf-token').getAttribute('content'), 'Content-Type':'application/json', "Access-Control-Allow-Origin" : "*", "Access-Control-Allow-Credentials" : true },
+        {headers:{'Content-Type':'application/json', "Access-Control-Allow-Origin" : "*", "Access-Control-Allow-Credentials" : true },
             method: 'get',
-            mode: "same-origin",
-            credentials: "same-origin",
         }).then((response) => {
             console.log('response ' + response);
             response.json().then((data) => {
@@ -60,7 +56,7 @@ function Home ({currentUserId}){
         });
         
         setLoading(false);
-    */},[]);
+    },[]);
 
     function appendNewStatus(statusObject){
         console.log(JSON.stringify(statusObject) + ' sss')
@@ -107,10 +103,10 @@ function Home ({currentUserId}){
                     <h1 className='headerText' >Home</h1>
                 </div>*/
                 }
-                <Usercard currentUserId={currentUserId} profileOwnerInfo={profileOwnerInfo}></Usercard>
+                <Usercard currentUserId={currentUserInfo.userID} profileOwnerInfo={currentUserInfo}></Usercard>
                 { /*pfpUrl && <img style={{height: '64px', width:'64px', objectFit: 'cover', alignSelf: 'center'}} src={pfpUrl}></img>*/}
                 {/*<HomeInput currentUserId = {userId} profileOwnerInfo={profileOwnerInfo} appendNewStatus={appendNewStatus}></HomeInput>*/}
-            <Feed home={true} currentUserId={currentUserId} pageOwnerId={null} appendNewStatus={appendNewStatus} deleteStatus={deleteStatus} feedArray={feedArray}></Feed>
+            <Feed home={true} currentUserId={currentUserInfo.userID} pageOwnerId={null} appendNewStatus={appendNewStatus} deleteStatus={deleteStatus} feedArray={feedArray} db={db}></Feed>
         </div>
     )
     return (

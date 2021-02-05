@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import UserCard from './UserCard';
 import Feed from './Feed';
-import Loading from '../Utility/Loading';
 import {
     BrowserRouter as Router,
     Switch,
@@ -12,7 +11,7 @@ import {
     useParams
   } from "react-router-dom";
 //SPLIT THIS UP LATER. SPLIT USER PROFILE LOAD INTO ONE COMPONENT, THEN SWITCH USER CONTENT LOAD INTO ANOTHER
-function UserPage ({currentUserId}){
+function UserPage ({currentUserId, db}){
     //currentUserId, pageOwnerUsername
     const [profileOwnerInfo, setProfileOwnerInfo] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -20,83 +19,38 @@ function UserPage ({currentUserId}){
     //const [currentUserId, setCurrentUserId] = useState();
     
     let { username } = useParams()
-
+    
     useEffect(() => {
-        if (user) {
-                const lowerUsername = usernameHeader.innerHTML.toLowerCase();
-                db.collection('users').get().then(snapshot => {
-                    snapshot.docs.forEach(doc =>{
-                        if (doc.data().username === lowerUsername) {
-                            console.log(doc.data());
-                            const twitterAnchor = document.getElementById('twitterAnchor');
-                            twitterAnchor.setAttribute('target', '_blank');
-                            const redditAnchor = document.getElementById('redditAnchor');
-                            redditAnchor.setAttribute('target', '_blank');
-                            const instagramAnchor = document.getElementById('instagramAnchor');
-                            instagramAnchor.setAttribute('target', '_blank');
-                            const youtubeAnchor = document.getElementById('youtubeAnchor');
-                            youtubeAnchor.setAttribute('target', '_blank');
-                            const facebookAnchor = document.getElementById('facebookAnchor');
-                            facebookAnchor.setAttribute('target', '_blank');
-                            if (doc.data().twitterUrl !== 'Please Enter our URL') {
-                                console.log(doc.data().twitterUrl);
-                                twitterAnchor.setAttribute('href', doc.data().twitterUrl);
-                            }
-                            if (doc.data().instagramUrl !== 'Please Enter our URL') {
-                                instagramAnchor.setAttribute('href', doc.data().instagramUrl);
-                            }
-                            if (doc.data().facebookUrl !== 'Please Enter our URL') {
-                                facebookAnchor.setAttribute('href', doc.data().facebookUrl);
-                            }
-                            if (doc.data().youtubeUrl !== 'Please Enter our URL') {
-                                youtubeAnchor.setAttribute('href', doc.data().youtubeUrl);
-                            }
-                            if (doc.data().redditUrl !== 'Please Enter our URL') {
-                                redditAnchor.setAttribute('href', doc.data().redditUrl);
-                            }
-                        }
-                    });
-                });
-            }
-        let url = new URL('http://localhost:80/api/feed')
-        let param = {query: username}
-        url.search = new URLSearchParams(param).toString();
+            
+        let url = new URL("https://us-central1-aesthetic-92afd.cloudfunctions.net/api/users/feed/" + username)
         
-        fetch(url, {
+        fetch("https://us-central1-aesthetic-92afd.cloudfunctions.net/api/users/feed/" + username, {
             headers:{
                 'Content-Type':'application/json',
             },
             method: 'get',
-            mode: "same-origin",
-            credentials: "same-origin",
         }).then((response) => {
             console.log('response ' + response);
             response.json().then((data) => {
                 console.log(data);
-                setFeedArray(data['feed'])
-                
+                setFeedArray(data)
                 //if array of activity, show, else don't and load other return statement
             });
         });
 
 
-        url = new URL('http://localhost:80/api/profile')
-        param = {query: username}
-
-        url.search = new URLSearchParams(param).toString();
+        url = new URL("https://us-central1-aesthetic-92afd.cloudfunctions.net/api/users/userInfo/" + username )
         
         fetch(url, {
             headers:{
                 'Content-Type':'application/json',
             },
             method: 'get',
-            mode: "same-origin",
-            credentials: "same-origin",
         }).then((response) => {
             console.log('response ' + response);
             response.json().then((data) => {
                 console.log(data);
-                setProfileOwnerInfo(data['profileOwnerInfo']);
+                setProfileOwnerInfo(data);
                 setLoading(false);
                 //if array of activity, show, else don't and load other return statement
             });
@@ -105,7 +59,7 @@ function UserPage ({currentUserId}){
       }, []);
         //return(<div>memes</div>)
         if (loading){
-            return(<Loading></Loading>)
+            return(<div></div>)
         }
         else {
             return (
