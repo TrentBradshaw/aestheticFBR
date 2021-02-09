@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-function Feed({home, currentUserId, profileOwnerId, appendNewStatus, deleteStatus, feedArray, db}) {
+function Feed({home, currentUserId, feedArray}) {
     console.log(feedArray + 'feedarray')
     if(feedArray){
         return (

@@ -10,72 +10,51 @@ import {
     Link,
     useParams
   } from "react-router-dom";
+import { SettingsApplications } from '@material-ui/icons';
 //SPLIT THIS UP LATER. SPLIT USER PROFILE LOAD INTO ONE COMPONENT, THEN SWITCH USER CONTENT LOAD INTO ANOTHER
 function UserPage ({currentUserId, db}){
+    console.log('yeeemee')
     //currentUserId, pageOwnerUsername
     const [profileOwnerInfo, setProfileOwnerInfo] = useState([]);
     const [loading, setLoading] = useState(true);
     const [feedArray, setFeedArray] = useState();
-    //const [currentUserId, setCurrentUserId] = useState();
-    
-    let { username } = useParams()
+    let { username } = useParams();
     
     useEffect(() => {
-            
-        let url = new URL("https://us-central1-aesthetic-92afd.cloudfunctions.net/api/users/feed/" + username)
-        
-        fetch("https://us-central1-aesthetic-92afd.cloudfunctions.net/api/users/feed/" + username, {
-            headers:{
-                'Content-Type':'application/json',
-            },
-            method: 'get',
-        }).then((response) => {
-            console.log('response ' + response);
-            response.json().then((data) => {
-                console.log(data);
-                setFeedArray(data)
-                //if array of activity, show, else don't and load other return statement
+        const data = {};
+        const aesthetics = [];
+        db.collection("aesthetics").where("username", "==", username)
+            .get()
+            .then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                console.log('doccdata' +doc.data());
+                aesthetics.push(doc.data());
             });
         });
-
-
-        url = new URL("https://us-central1-aesthetic-92afd.cloudfunctions.net/api/users/userInfo/" + username )
-        
-        fetch(url, {
-            headers:{
-                'Content-Type':'application/json',
-            },
-            method: 'get',
-        }).then((response) => {
-            console.log('response ' + response);
-            response.json().then((data) => {
-                console.log(data);
-                setProfileOwnerInfo(data);
-                setLoading(false);
-                //if array of activity, show, else don't and load other return statement
+        db.collection("users").get().then((snapshot) => {
+            snapshot.docs.forEach((doc) => {
+                if (doc.data().username.toLowerCase() == username) {
+                    setProfileOwnerInfo(doc.data());
+                    console.log('user' + doc.data())
+                    }
             });
         });
-            
+        setProfileOwnerInfo();
+        setFeedArray(aesthetics);
+        setLoading(false);
+        console.log('data ' + data);
+        console.log('aesthetics ' + aesthetics);
       }, []);
-        //return(<div>memes</div>)
-        if (loading){
-            return(<div></div>)
-        }
-        else {
-            return (
+      if(loading)
+        return(<div></div>);
+        return(
+            <div style={{marginTop: '50px'}}>
+                <UserCard currentUserId={currentUserId}  profileOwnerInfo={profileOwnerInfo}></UserCard>
+                <Feed home={false} currentUserId={currentUserId} feedArray={feedArray}></Feed>
+            </div>
             
-                <div className={['bordered', 'baseMainContainer', 'divBackground'].join(" ")}>
-                    <UserCard currentUserId = {currentUserId} profileOwnerInfo={profileOwnerInfo}></UserCard>
-                    <Feed home={false} currentUserId= {currentUserId} profileOwnerId={profileOwnerInfo.id} feedArray={feedArray}></Feed>
-                </div>
-            ) 
-        }
+        )
+        
 } 
-    
-if (document.getElementById('UserPageContainer')) {
-   ReactDOM.render(<UserPage 
-   //currentUserId={document.getElementById('dataHolder').getAttribute('currentUserId')}
-   //pageOwnerUsername={document.getElementById('dataHolder').getAttribute('pageOwnerUsername')}
-   />, document.getElementById('UserPageContainer'));
-}
+
 export default UserPage;

@@ -11,53 +11,6 @@ function Home ({currentUserInfo, db}){
     const [isLoading, setLoading] = useState(true);
     const [pfpUrl, setPfpUrl] = useState();
     
-    useEffect(() => {
-        
-        //get feed array
-        let param, url
-        fetch('http://localhost:80/api/userdetails/' + currentUserInfo.username, {
-        headers:{'Content-Type':'application/json',},
-        method: 'get',
-        }).then((response) => {
-            console.log(response)
-            response.json().then((data) => {
-                setPfpUrl(data['pfpUrl'])
-                url = new URL('http://localhost:80/api/profile')
-                param = {query: data['username']}
-                url.search = new URLSearchParams(param).toString();
-                fetch(url, {
-                    headers:{'Content-Type':'application/json',},
-                    method: 'get',
-                    mode: "same-origin",
-                    credentials: "same-origin",
-                }).then((response) => {
-                    console.log('response ' + response);
-                    response.json().then((data) => {
-                        console.log(data);
-                        console.log('CLOWNSHOE');
-                        setProfileOwnerInfo(data['profileOwnerInfo']);
-                        
-                        //if array of activity, show, else don't and load other return statement
-                    });
-                });
-                
-            });
-        })
-       
-        fetch('http://localhost:80/api/feed/home', 
-        {headers:{'Content-Type':'application/json', "Access-Control-Allow-Origin" : "*", "Access-Control-Allow-Credentials" : true },
-            method: 'get',
-        }).then((response) => {
-            console.log('response ' + response);
-            response.json().then((data) => {
-                console.log(data['username'] + ' username')
-                changeFeedArray(data['statuses'])
-            });
-        });
-        
-        setLoading(false);
-    },[]);
-
     function appendNewStatus(statusObject){
         console.log(JSON.stringify(statusObject) + ' sss')
         let tempFeedArray = [...feedArray]; 

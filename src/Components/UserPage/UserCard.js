@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import FollowButton from './FollowButton';
 //SPLIT THIS UP LATER. SPLIT USER PROFILE LOAD INTO ONE COMPONENT, THEN SWITCH USER CONTENT LOAD INTO ANOTHER
 function UserCard({currentUserId, profileOwnerInfo}) {
+    if(profileOwnerInfo){
         return (
             <div style={{marginBottom: '3%'}} id= 'userCard' className={['bordered', 'divBackground'].join(" ")}>
                 <div className = 'divHeader' style={{ display: 'flex'}}>
@@ -19,6 +20,10 @@ function UserCard({currentUserId, profileOwnerInfo}) {
                 </div> 
             </div>
         );
+    }else {
+        return(<div></div>)
+    }
+        
 } 
     
 export default UserCard

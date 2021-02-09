@@ -7,9 +7,10 @@ import {
   } from "react-router-dom";
 import fire from './fire';
 import Login from './Login';
-import Home from './Components/Home/Home'
+import Home from './Components/Home/Home';
 import Header from './Components/Header/Header';
-import UserPage from './Components/UserPage/UserPage'
+import UserPage from './Components/UserPage/UserPage';
+import AestheticSubmitForm from './Components/SubmitPages/AestheticSubmitForm';
 
 const db = fire.firestore();											  // connect to firebases firebase firestore database
 db.settings({timestampsInSnapshots: true}); 								  // allow timestamps to come with the snapshots
@@ -17,10 +18,10 @@ const storageService = fire.storage();									  // refer to the firebase storag
 const storageRef = storageService.ref();
 const database = fire.database();
 const auth = fire.auth();
+FieldValue = require('firebase-admin').firestore.FieldValue;
+
 
 const App = () => {
-
-    console.log('yee')
     const [user, setUser] = useState('');
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
@@ -97,6 +98,7 @@ const App = () => {
     };
 
     const authListener = () => {
+        console.log('in auth listener')
         fire.auth().onAuthStateChanged(user => {
             if (user){
                 clearInputs();
@@ -108,14 +110,13 @@ const App = () => {
                         if (doc.data().userID === user.uid) {
                             console.log('doc found')
                             console.log(doc.data());
-                            
                             setCurrentUserInfo(doc.data())
                             setUsername(doc.data().username);
                             
                   }
                 });
-                if (window.location == 'localhost:3000') 
-                    window.location.href = 'localhost:3000/home'; 
+                if (window.location == 'localhost:8080') 
+                    window.location.href = 'localhost:8080/home'; 
               });
             }else {setUser("")}
         });
@@ -123,7 +124,19 @@ const App = () => {
     useEffect(() => {
         authListener();
         console.log(user)
-        console.log('yeet');
+        let firebaseUser = fire.auth().currentUser;
+        if (firebaseUser) {
+        // User is signed in.
+        setAuthChecked(true);
+        setUser(firebaseUser);
+        if (window.location == 'localhost:8080') 
+                    window.location.href = 'localhost:8080/home'; 
+        
+        } else {
+        // No user is signed in.
+        setAuthChecked(true);
+        }
+        
         /*
         if(user){
             console.log('user found')
@@ -157,12 +170,12 @@ const App = () => {
     if(authChecked){
         if(user){
             console.log(window.location)
-            if (window.location.href == "http://localhost:3000/") 
-                window.location.href = "http://localhost:3000/home"; 
+            if (window.location.href == "http://localhost:8080/") 
+                window.location.href = "http://localhost:8080/home"; 
         }
         return(
             <div>
-            {user 
+            {currentUserInfo 
                 ? 
                 <Router>
                     <Route path="/" render={() => (<Header currentUserInfo={currentUserInfo}/>)}/>
@@ -170,6 +183,7 @@ const App = () => {
                         <Route exact path="/home" render= {() => (<Home currentUserInfo={currentUserInfo } db={db}></Home>)}/>
                         <Route exact path="/user/:username/aesthetic/:aestheticId" render= {() => console.log('aesthetic')}/>
                         <Route exact path="/user/:username" render={() =>(<UserPage currentUserId={currentUserInfo.userID} db={db}></UserPage>)}/>
+                        <Route exact path="/aesthetic/submit" render={() =>(<AestheticSubmitForm currentUserId={user.uid} db={db} storageService={storageService} fire={fire}></AestheticSubmitForm>)}/>
                     </Switch>
                 </Router>
                 : <Login 
